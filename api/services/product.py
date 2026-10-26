@@ -4,6 +4,7 @@ class Product:
         self.name = name
         self.price = price 
         self.stock = stock
+    
     def is_available(self) : 
         if self.stock > 0:
             return True 
