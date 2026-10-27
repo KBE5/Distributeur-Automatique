@@ -1,3 +1,4 @@
+
 from api.services.product import Product
 
 class VendingMachine:
@@ -23,21 +24,30 @@ class VendingMachine:
         self.credit += amount 
         return self.credit
 
-    def buy_product(self, code:str) -> Product:
+    def buy_product(self, code: str) -> Product:
+        # Le produit doit exister (LookupError sinon -> 404)
         product = self.get_product(code)
         if not product:
-            raise ValueError(f"Produit avec le code {code} non trouvé.")
-        
+            raise LookupError(f"Produit avec le code {code} non trouvé.")
+
+        # Il doit rester au moins un exemplaire (ValueError sinon -> 400)
+        if not product.is_available():  # ou product.stock <= 0
+            raise ValueError("Produit en rupture de stock.")
+
+        # Le crédit doit couvrir le prix (ValueError sinon -> 400)
         if self.credit < product.price:
-            raise ValueError(f"Crédit insuffisant. Crédit actuel: {self.credit}, Prix du produit: {product.price}.")    
-        
-        if product.stock <= 0:
-            raise ValueError("Produit épuisé.")
+            raise ValueError(
+                f"Crédit insuffisant. Requis: {product.price}, Actuel: {self.credit}"
+            )
+
+        # Si tout est bon : paiement et distribution
         self.credit -= product.price
-        product.stock -= 1
+        product.dispense()  # Diminue le stock de 1
+
         return product
 
-    def refund(self):
+
+    def refund(self) -> int:
         refunded_amount = self.credit
         self.credit = 0
         return refunded_amount
