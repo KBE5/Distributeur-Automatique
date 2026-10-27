@@ -1,14 +1,14 @@
-from product import Product
+from api.services.product import Product
 
 class VendingMachine:
     def __init__(self):
         self.credit = 0
-        #,code:str, name:str, price: int, stock:int):
+        
         self.products: dict[str, Product] ={
-            "A1": Product("A1", "Cola", 150, 5),
-            "A2": Product("A2", "Eau", 100, 8),
-            "B1": Product("B1", "Chips", 200, 3),
-            "B2": Product("B2", "Chocolat", 180, 4),
+            "A1": Product(code="A1", name="Cola", price=150, stock=5),
+            "A2": Product(code="A2", name="Eau", price=100, stock=8),
+            "B1": Product(code="B1", name="Chips", price=200, stock=3),
+            "B2": Product(code="B2", name="Chocolat", price=180, stock=4),
         }
 
     def get_products(self) -> list[Product]:
@@ -32,7 +32,7 @@ class VendingMachine:
             raise ValueError(f"Crédit insuffisant. Crédit actuel: {self.credit}, Prix du produit: {product.price}.")    
         
         if product.stock <= 0:
-                    raise ValueError("Produit épuisé.")
+            raise ValueError("Produit épuisé.")
         self.credit -= product.price
         product.stock -= 1
         return product
